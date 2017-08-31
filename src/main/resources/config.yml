@@ -1,0 +1,9 @@
+Use-Prefix: true
+
+Blocks:
+  COAL_ORE: 10
+  IRON_ORE: 25
+  GOLD_ORE: 30
+  LAPIS_ORE: 45
+  REDSTONE_ORE: 45
+  DIAMOND_ORE: 60

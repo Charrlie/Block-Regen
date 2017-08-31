@@ -1,0 +1,3 @@
+prefix: "&6&lBlock Regen &8&l\u00BB &7"
+
+block-broke: "This block will regenerate in &e%time%&7!"

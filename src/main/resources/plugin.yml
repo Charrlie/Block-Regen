@@ -1,0 +1,5 @@
+name: BlockRegen
+description: Allow blocks to regenerate after being broken.
+version: 1.0
+author: Vanishedd
+main: com.vanishedd.blockregen.BlockRegen
