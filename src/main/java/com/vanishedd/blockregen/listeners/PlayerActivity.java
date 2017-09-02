@@ -43,7 +43,7 @@ public class PlayerActivity implements Listener {
                     continue;
                 }
 
-                int regenTime = plugin.getConfig().getInt("Blocks." + world + key, 30);
+                int regenTime = plugin.getConfig().getInt("Blocks." + world + "." + key, 30);
                 Location blockLocation = block.getLocation();
                 final Material blockType = block.getType();
                 final Byte data = block.getData();
