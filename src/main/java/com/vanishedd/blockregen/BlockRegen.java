@@ -64,31 +64,42 @@ public class BlockRegen extends JavaPlugin {
             final Byte data = Byte.parseByte(split[6]);
             Block block = location.getBlock();
 
-            for (String key : getConfig().getConfigurationSection("Blocks").getKeys(false)) {
-                if (!key.equalsIgnoreCase(material.name())) {
+            Long regenTime = 0L;
+
+            for (String world : getConfig().getConfigurationSection("Blocks").getKeys(false)) {
+                if (!world.equalsIgnoreCase(location.getWorld().getName())) {
                     continue;
                 }
 
-                Long regenTime = getConfig().getInt("Blocks." + key, 300) * 1000L;
-                Long endTime = startTime + regenTime;
-                Long difference = endTime - System.currentTimeMillis();
+                for (String blockType : getConfig().getConfigurationSection("Blocks." + world).getKeys(false)) {
+                    if (!blockType.equalsIgnoreCase(material.name())) {
+                        Bukkit.broadcastMessage(blockType);
+                        Bukkit.broadcastMessage(material.name());
+                        continue;
+                    }
 
-                if (difference <= 0) {
-                    block.setType(material);
-                    block.setData(data);
-                    return;
+                    regenTime = getConfig().getInt("Blocks." + world + "." + blockType, 30) * 1000L;
                 }
-
-                Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-                    List<String> regenerating = fileManager.getFile("data").getCustomConfig().getStringList("Regenerating");
-
-                    regenerating.remove(blockInfo);
-                    block.setType(material);
-                    block.setData(data);
-                    fileManager.getFile("data").getCustomConfig().set("Regenerating", regenerating);
-                    fileManager.getFile("data").saveCustomConfig();
-                }, (difference/1000) * 20L);
             }
+
+            Long endTime = startTime + regenTime;
+            Long difference = endTime - System.currentTimeMillis();
+
+            if (difference <= 0) {
+                block.setType(material);
+                block.setData(data);
+                return;
+            }
+
+            Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+                List<String> regenerating = fileManager.getFile("data").getCustomConfig().getStringList("Regenerating");
+
+                regenerating.remove(blockInfo);
+                block.setType(material);
+                block.setData(data);
+                fileManager.getFile("data").getCustomConfig().set("Regenerating", regenerating);
+                fileManager.getFile("data").saveCustomConfig();
+            }, (difference/1000) * 20L);
         }
     }
 }

@@ -33,38 +33,50 @@ public class PlayerActivity implements Listener {
             return;
         }
 
-        for (String key : plugin.getConfig().getConfigurationSection("Blocks").getKeys(false)) {
-            if (!key.equalsIgnoreCase(block.getType().name())) {
+        for (String world : plugin.getConfig().getConfigurationSection("Blocks").getKeys(false)) {
+            if (!world.equalsIgnoreCase(block.getWorld().getName())) {
                 continue;
             }
 
-            int regenTime = plugin.getConfig().getInt("Blocks." + key, 300);
-            Location blockLocation = block.getLocation();
-            final Material blockType = block.getType();
-            final Byte data = block.getData();
-            final String blockInfo = blockLocation.getWorld().getName() + ";" + blockLocation.getBlockX() + ";" + blockLocation.getBlockY() + ";" + blockLocation.getBlockZ() + ";" + System.currentTimeMillis() + ";" + blockType.name() + ";" + data;
-            List<String> blocks = dataFile.getCustomConfig().getStringList("Regenerating");
+            for (String key : plugin.getConfig().getConfigurationSection("Blocks." + world).getKeys(false)) {
+                if (!key.equalsIgnoreCase(block.getType().name())) {
+                    continue;
+                }
 
-            blocks.add(blockInfo);
-            dataFile.getCustomConfig().set("Regenerating", blocks);
-            dataFile.saveCustomConfig();
+                int regenTime = plugin.getConfig().getInt("Blocks." + world + key, 30);
+                Location blockLocation = block.getLocation();
+                final Material blockType = block.getType();
+                final Byte data = block.getData();
+                final String blockInfo = blockLocation.getWorld().getName() + ";" + blockLocation.getBlockX() + ";" + blockLocation.getBlockY() + ";" + blockLocation.getBlockZ() + ";" + System.currentTimeMillis() + ";" + blockType.name() + ";" + data;
+                List<String> blocks = dataFile.getCustomConfig().getStringList("Regenerating");
 
-            for (ItemStack drop : block.getDrops()) {
-                blockLocation.getWorld().dropItemNaturally(blockLocation, drop);
-            }
-            block.setType(Material.BEDROCK);
-            e.setCancelled(true);
-            player.sendMessage(Lang.BLOCK_BROKE.toString().replace("%time%", Util.convertMs(regenTime * 1000L)));
-
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                List<String> regenerating = dataFile.getCustomConfig().getStringList("Regenerating");
-
-                block.setType(blockType);
-                block.setData(data);
-                regenerating.remove(blockInfo);
-                dataFile.getCustomConfig().set("Regenerating", regenerating);
+                blocks.add(blockInfo);
+                dataFile.getCustomConfig().set("Regenerating", blocks);
                 dataFile.saveCustomConfig();
-            }, regenTime * 20L);
+
+                for (ItemStack drop : block.getDrops()) {
+                    blockLocation.getWorld().dropItemNaturally(blockLocation, drop);
+                }
+
+                try {
+                    block.setType(Material.valueOf(plugin.getConfig().getString("Placeholder").toUpperCase()));
+                } catch (IllegalArgumentException ex) {
+                    block.setType(Material.BEDROCK);
+                }
+
+                e.setCancelled(true);
+                player.sendMessage(Lang.BLOCK_BROKE.toString().replace("%time%", Util.convertMs(regenTime * 1000L)));
+
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                    List<String> regenerating = dataFile.getCustomConfig().getStringList("Regenerating");
+
+                    block.setType(blockType);
+                    block.setData(data);
+                    regenerating.remove(blockInfo);
+                    dataFile.getCustomConfig().set("Regenerating", regenerating);
+                    dataFile.saveCustomConfig();
+                }, regenTime * 20L);
+            }
         }
     }
 }
