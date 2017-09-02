@@ -1,9 +1,13 @@
 Use-Prefix: true
+Placeholder: BEDROCK
 
 Blocks:
-  COAL_ORE: 10
-  IRON_ORE: 25
-  GOLD_ORE: 30
-  LAPIS_ORE: 45
-  REDSTONE_ORE: 45
-  DIAMOND_ORE: 60
+  world:
+    COAL_ORE: 10
+    IRON_ORE: 25
+    GOLD_ORE: 30
+    LAPIS_ORE: 45
+    REDSTONE_ORE: 45
+    DIAMOND_ORE: 60
+  world_nether:
+    QUARTZ_ORE: 30
