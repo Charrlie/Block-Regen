@@ -73,8 +73,6 @@ public class BlockRegen extends JavaPlugin {
 
                 for (String blockType : getConfig().getConfigurationSection("Blocks." + world).getKeys(false)) {
                     if (!blockType.equalsIgnoreCase(material.name())) {
-                        Bukkit.broadcastMessage(blockType);
-                        Bukkit.broadcastMessage(material.name());
                         continue;
                     }
 
