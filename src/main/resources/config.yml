@@ -1,6 +1,26 @@
+#Should the plugin add the prefix before every message?
 Use-Prefix: true
+
+#What should the regenerating block look like?
 Placeholder: BEDROCK
 
+#Should the plugin regenerate a random block instead of the original?
+Random-Regen: false
+
+#What random blocks should the plugin regenerate? What chance should they be?
+Regen-Blocks:
+  world:
+    COAL_ORE: 30
+    IRON_ORE: 25
+    GOLD_ORE: 15
+    LAPIS_ORE: 12.5
+    REDSTONE_ORE: 12.5
+    DIAMOND_ORE: 5
+  world_nether:
+    QUARTZ_ORE: 50
+    NETHERRACK: 50
+
+#What blocks should the plugin allow to regenerate, how long should it take?
 Blocks:
   world:
     COAL_ORE: 10
