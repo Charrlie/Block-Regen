@@ -22,6 +22,9 @@ public class BlockRegen extends JavaPlugin {
         instance = this;
 
         registerConfig();
+
+        fixWorldNames();
+
         registerListeners();
         registerBlocks();
     }
@@ -92,12 +95,48 @@ public class BlockRegen extends JavaPlugin {
             Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
                 List<String> regenerating = fileManager.getFile("data").getCustomConfig().getStringList("Regenerating");
 
+                if (getConfig().getBoolean("Random-Regen")) {
+                    block.setType(Material.valueOf(getRandomRegenType(location.getWorld().getName().toLowerCase())));
+                } else {
+                    block.setType(material);
+                    block.setData(data);
+                }
+
                 regenerating.remove(blockInfo);
-                block.setType(material);
-                block.setData(data);
                 fileManager.getFile("data").getCustomConfig().set("Regenerating", regenerating);
                 fileManager.getFile("data").saveCustomConfig();
             }, (difference/1000) * 20L);
         }
+    }
+
+    private String getRandomRegenType(String world) {
+        String[] randomBlocks = getConfig().getConfigurationSection("Regen-Blocks." + world).getKeys(false).toArray(new String[getConfig().getConfigurationSection("Regen-Blocks." + world).getKeys(false).size()]);
+        double totalWeight = 0;
+
+        for (String blockType : randomBlocks) {
+            totalWeight += getConfig().getDouble("Regen-Blocks." + world + "." + blockType);
+        }
+
+        double random = Math.random() * totalWeight;
+
+        for (String blockType : randomBlocks) {
+            random -= getConfig().getDouble("Regen-Blocks." + world + "." + blockType);
+
+            if (random <= 0.0) {
+                return blockType;
+            }
+        }
+        return "COBBLESTONE";
+    }
+
+    private void fixWorldNames() {
+        for (String key : getConfig().getConfigurationSection("Blocks").getKeys(false)) {
+            if (key.equals(key.toLowerCase())) {
+                continue;
+            }
+
+            getConfig().set(key.toLowerCase(), getConfig().getConfigurationSection("Blocks." + key));
+        }
+        saveConfig();
     }
 }

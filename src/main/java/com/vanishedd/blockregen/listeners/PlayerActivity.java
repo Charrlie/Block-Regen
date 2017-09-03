@@ -70,13 +70,38 @@ public class PlayerActivity implements Listener {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                     List<String> regenerating = dataFile.getCustomConfig().getStringList("Regenerating");
 
-                    block.setType(blockType);
-                    block.setData(data);
+                    if (plugin.getConfig().getBoolean("Random-Regen")) {
+                        block.setType(Material.valueOf(getRandomRegenType(world)));
+                    } else {
+                        block.setType(blockType);
+                        block.setData(data);
+                    }
+
                     regenerating.remove(blockInfo);
                     dataFile.getCustomConfig().set("Regenerating", regenerating);
                     dataFile.saveCustomConfig();
                 }, regenTime * 20L);
             }
         }
+    }
+
+    private String getRandomRegenType(String world) {
+        String[] randomBlocks = plugin.getConfig().getConfigurationSection("Regen-Blocks." + world).getKeys(false).toArray(new String[plugin.getConfig().getConfigurationSection("Regen-Blocks." + world).getKeys(false).size()]);
+        double totalWeight = 0;
+
+        for (String blockType : randomBlocks) {
+            totalWeight += plugin.getConfig().getDouble("Regen-Blocks." + world + "." + blockType);
+        }
+
+        double random = Math.random() * totalWeight;
+
+        for (String blockType : randomBlocks) {
+            random -= plugin.getConfig().getDouble("Regen-Blocks." + world + "." + blockType);
+
+            if (random <= 0.0) {
+                return blockType;
+            }
+        }
+        return "COBBLESTONE";
     }
 }
